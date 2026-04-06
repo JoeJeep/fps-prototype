@@ -1,6 +1,6 @@
 # FPS Optimization Prototype
 **GDT-110 | Topic 2 Assignment**
-**Student:** Levi Jenkins
+**Student:** Levi
 **Engine/Language:** Python 3 + Pygame
 
 ---
@@ -18,7 +18,7 @@ The prototype lets you **feel** the difference between 30 FPS, 60 FPS, and uncap
 | Feature | Description |
 |---|---|
 | **Live FPS Counter** | Real-time FPS display with color coding (green/orange/red) |
-| **FPS Mode Toggle** | Switch between 30, 60, and 480 FPS mid-game with TAB |
+| **FPS Mode Toggle** | Switch between 30, 60, and uncapped FPS mid-game with TAB |
 | **FPS History Graph** | Mini line graph in the top-right showing frame rate over time |
 | **Object Pooling** | Bullets drawn from a pre-allocated pool of 60 — HUD shows active vs. waiting |
 | **Enemy Spawning** | Enemies spawn from screen edges and chase the player |
@@ -112,9 +112,7 @@ fps_prototype/
 
 ## 🔗 GitHub Repository
 
-[https://github.com/YOUR_USERNAME/fps-prototype](https://github.com/YOUR_USERNAME/fps-prototype)
-
-*(Replace YOUR_USERNAME with your GitHub username after uploading)*
+[https://github.com/JoeJeep/fps-prototype](https://github.com/JoeJeep/fps-prototype)
 
 ---
 
