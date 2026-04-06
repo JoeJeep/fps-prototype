@@ -118,7 +118,7 @@ fps_prototype/
 
 ## 📹 Video Demo
 
-[Insert your Loom / YouTube / Vimeo link here after recording]
+[https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c](https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c)
 
 ---
 
