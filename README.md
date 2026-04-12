@@ -1,140 +1,124 @@
-# FPS Optimization Prototype
-**GDT-110 | Topic 2 Assignment**
+# Memory Management Prototype
+**GDT-110 | Week 3 Assignment**
 **Student:** Levi
-**Engine/Language:** Python 3 + Pygame
+**Language:** Python 3.12 + Pygame
 
 ---
 
-## 📌 Project Overview
+## GitHub Repository
 
-This prototype demonstrates **frame rate optimization** as a core gameplay system mechanic, directly tied to the Topic 1 research report on *Frame Rate Optimization and Player Immersion in Fast-Paced Action Games*.
+https://github.com/JoeJeep/fps-prototype
 
-The prototype lets you **feel** the difference between 30 FPS, 60 FPS, and uncapped frame rates in real time while playing a simple action game. It also visually demonstrates **object pooling** — one of the key architectural techniques covered in the research report — by showing how bullets are reused from a pre-allocated pool instead of being created and destroyed every frame.
+## Video Demo
 
----
-
-## 🎮 Gameplay Features
-
-| Feature | Description |
-|---|---|
-| **Live FPS Counter** | Real-time FPS display with color coding (green/orange/red) |
-| **FPS Mode Toggle** | Switch between 30, 60, and uncapped FPS mid-game with TAB |
-| **FPS History Graph** | Mini line graph in the top-right showing frame rate over time |
-| **Object Pooling** | Bullets drawn from a pre-allocated pool of 60 — HUD shows active vs. waiting |
-| **Enemy Spawning** | Enemies spawn from screen edges and chase the player |
-| **Shooting** | Aim with mouse, shoot with SPACE |
-| **Score System** | Earn 10 points per enemy eliminated |
+https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c
 
 ---
 
-## 🖥️ How to Run
+## Project Overview
 
-### Step 1 — Install Python
-If you don't have Python installed:
-1. Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
-2. Download **Python 3.10 or newer**
-3. During install, **check the box that says "Add Python to PATH"**
+This prototype expands on the Week 2 FPS prototype to demonstrate four memory management techniques covered in the Week 3 simulation report on Unity's memory system. All concepts are implemented in Python using Pygame as the runtime environment.
 
-### Step 2 — Install Pygame
-Open a terminal (Command Prompt or PowerShell on Windows, Terminal on Mac):
+The four systems demonstrated are:
+
+1. Resource loading and unloading via a ResourceManager that tracks reference counts
+2. Texture caching that reuses already-loaded assets instead of reallocating them
+3. Object pooling that pre-allocates bullets and reuses them throughout gameplay
+4. Performance comparison showing allocations saved, GC pauses avoided, and memory footprint
+
+---
+
+## How to Run
+
+### Requirements
+
+- Python 3.10, 3.11, or 3.12 (Pygame does not support Python 3.14 yet)
+- Pygame library
+
+### Install Pygame
+
 ```
 pip install pygame
 ```
 
-### Step 3 — Download / Clone the Project
-**Option A — Download ZIP:**
-1. Click the green **Code** button on GitHub
-2. Click **Download ZIP**
-3. Extract the folder anywhere on your computer
+or if you have multiple Python versions:
 
-**Option B — Clone with Git:**
 ```
-git clone https://github.com/YOUR_USERNAME/fps-prototype.git
+py -3.12 -m pip install pygame
 ```
 
-### Step 4 — Open in VS Code
-1. Open **VS Code**
-2. Click **File → Open Folder**
-3. Select the `fps_prototype` folder you just extracted or cloned
-4. You should see `main.py` and `object_pool.py` in the Explorer panel on the left
+### Run the Game
 
-### Step 5 — Run the Game
-**Option A — From VS Code terminal:**
-1. Press **Ctrl + `** (backtick) to open the terminal inside VS Code
-2. Type:
 ```
-python main.py
-```
-3. Press Enter — the game window will open
-
-**Option B — From your system terminal:**
-1. Navigate to the folder:
-```
-cd path/to/fps_prototype
-```
-2. Run:
-```
-python main.py
+py -3.12 main.py
 ```
 
 ---
 
-## 🕹️ Controls
+## Controls
 
 | Key | Action |
 |---|---|
-| **W A S D** or **Arrow Keys** | Move player |
-| **SPACE** | Shoot toward nearest enemy |
-| **TAB** | Cycle FPS mode (30 → 60 → Uncapped → 30) |
-| **Close Window** | Quit |
+| WASD / Arrow keys | Move player |
+| SPACE | Shoot toward nearest enemy |
+| TAB | Cycle FPS mode (30 / 60 / 480) |
+| L | Load all catalogue textures into cache |
+| U | Unload all unused textures (simulates scene transition) |
+| P | Toggle performance stats panel |
+| R (game over) | Restart |
+| ESC (game over) | Quit |
 
 ---
 
-## 📊 What to Observe
+## What to Observe
 
-1. **Start at 60 FPS** (default) — movement feels smooth, enemies are manageable
-2. **Press TAB to switch to 30 FPS** — notice the choppier movement and slower bullet response
-3. **Press TAB again for Uncapped** — watch the FPS graph spike; on fast machines this can exceed 500+ FPS
-4. **Watch the pool HUD** — as you shoot, "Active" bullets increase and "Pooled" bullets decrease. When bullets go off-screen, they return to the pool — no new objects are ever created mid-game
+### Resource loading and caching
+Press L to load all textures. Watch the "Cached" counter and KB value go up in the top-left HUD. Press L again and notice the cache hit ratio bar fills further — textures already in memory are reused, not reallocated.
+
+### Unloading
+Press U to sweep unused textures out of memory. Watch the cached asset count drop and the event log at the bottom-left show which assets were removed.
+
+### Object pooling
+Shoot repeatedly with SPACE and watch "Bullets: X active / Y pooled" in the HUD. The active count rises and pooled drops, but no new objects are ever created — they come from the pre-allocated pool of 60.
+
+### Performance comparison panel
+The bottom-right panel (toggle with P) shows a side-by-side comparison of what memory usage would look like without optimisation versus with. Key rows to watch are allocations, GC pauses simulated, and allocations avoided.
 
 ---
 
-## 🗂️ File Structure
+## File Structure
 
 ```
 fps_prototype/
-├── main.py          ← Main game loop, player, enemies, HUD, rendering
-├── object_pool.py   ← Bullet and BulletPool classes (object pooling demo)
-└── README.md        ← This file
+├── main.py               Game loop, player, enemies, HUD, rendering
+├── object_pool.py        Bullet and BulletPool classes (object pooling)
+├── resource_manager.py   Asset loading, caching, reference counting, unloading
+├── performance_stats.py  Performance tracking and comparison overlay
+└── README.md             This file
 ```
 
 ---
 
-## 🔗 GitHub Repository
+## Key Concepts Demonstrated
 
-[https://github.com/JoeJeep/fps-prototype](https://github.com/JoeJeep/fps-prototype)
-
----
-
-## 📹 Video Demo
-
-[https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c](https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c)
-
----
-
-## 📚 Concepts Demonstrated
-
-- **Frame Rate Capping** — `clock.tick(fps)` enforces a frame budget, matching how Unreal, Unity, and Godot manage their render loops
-- **Object Pooling** — Pre-allocated `BulletPool` avoids runtime memory allocation and garbage collection spikes (directly references the GC stutter issue discussed in the research report)
-- **FPS Monitoring** — Live sampling mirrors the profiling tools in Unity's Frame Debugger and Unreal's Stat commands
-- **Game/System Separation** — `object_pool.py` is a separate module from `main.py`, mirroring the architectural separation discussed across all five engines in the report
+| Concept | Where in code | Unity equivalent |
+|---|---|---|
+| Lazy loading | resource_manager.py load_texture() | Resources.Load() |
+| Texture caching | resource_manager.py _cache dict | Asset cache / AssetBundle |
+| Reference counting | SimulatedTexture.ref_count | Object reference tracking |
+| Unload unused | resource_manager.py unload_unused() | Resources.UnloadUnusedAssets() |
+| Object pooling | object_pool.py BulletPool | Custom pool / Unity Pool API |
+| GC pressure sim | performance_stats.py record_baseline_alloc() | Mono GC behaviour |
 
 ---
 
-## 📖 References
+## References
 
-Epic Games. (2024). *Rendering and graphics in Unreal Engine.* https://dev.epicgames.com/documentation/en-us/unreal-engine/rendering-and-graphics-in-unreal-engine
+Unity Technologies. (2024a). Memory management overview. Unity Documentation.
+https://docs.unity3d.com/Manual/performance-memory-overview.html
 
-Unity Technologies. (2024). *Scriptable Render Pipeline.* https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html
+Unity Technologies. (2024b). AssetBundles overview. Unity Documentation.
+https://docs.unity3d.com/Manual/AssetBundlesIntro.html
 
-Pygame Community. (2024). *Pygame documentation.* https://www.pygame.org/docs/
+Pygame Community. (2024). Pygame documentation.
+https://www.pygame.org/docs/
