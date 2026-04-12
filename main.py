@@ -183,11 +183,13 @@ def main():
         # ── Scene preload ─────────────────────────────────────────────────────
         # Load only what this scene needs upfront (lazy loading for the rest)
         # This mirrors Unity's scene loading — allocate assets before gameplay.
+        # preload_scene handles acquire() internally so we pull from cache directly.
         res_mgr.preload_scene(SCENE_ASSETS, compression=SimulatedTexture.FULL)
         perf_stats.record_actual_alloc()   # count the real allocations
 
-        player_tex = res_mgr.load_texture("player_texture")
-        enemy_tex  = res_mgr.load_texture("enemy_texture")
+        # Pull references straight from cache — avoids double-incrementing ref count
+        player_tex = res_mgr._cache.get("player_texture")
+        enemy_tex  = res_mgr._cache.get("enemy_texture")
 
         # Object pool pre-allocates 60 bullets at startup — no runtime allocs
         bullet_pool  = BulletPool(size=60)
@@ -237,8 +239,17 @@ def main():
                                 perf_stats.record_actual_alloc()
 
                     # U = unload unused textures (simulate scene transition)
+                    # Force all ref counts to zero first so the sweep is visible,
+                    # then reload the scene assets so gameplay continues normally.
                     if event.key == pygame.K_u:
+                        for tex in list(res_mgr._cache.values()):
+                            tex.ref_count = 0
                         res_mgr.unload_unused()
+                        # Reload the assets the scene actually needs
+                        res_mgr.preload_scene(SCENE_ASSETS,
+                                              compression=SimulatedTexture.FULL)
+                        player_tex = res_mgr._cache.get("player_texture")
+                        enemy_tex  = res_mgr._cache.get("enemy_texture")
 
                     # P = toggle performance stats overlay
                     if event.key == pygame.K_p:
@@ -411,3 +422,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
