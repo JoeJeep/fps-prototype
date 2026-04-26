@@ -1,0 +1,132 @@
+# pseudocode.txt
+# GDT-110 | Week 5 Assignment
+# Design Patterns Prototype — Top-Down Shooter
+# Patterns: Singleton (GameManager) + State (GameState)
+# Language: Python + Pygame
+
+# =============================================================================
+# DESIGN PATTERN 1: SINGLETON — GameManager
+# =============================================================================
+# The Singleton pattern ensures only ONE instance of GameManager ever exists.
+# Every part of the game accesses the same GameManager instead of creating
+# their own copy. This prevents conflicts where two managers track different
+# scores or lives.
+
+CLASS GameManager:
+    _instance = None          # holds the single instance
+
+    METHOD get_instance():
+        IF _instance is None:
+            CREATE new GameManager
+            STORE it in _instance
+        RETURN _instance       # always return the same one
+
+    PROPERTIES:
+        score = 0
+        lives = 3
+        current_state = None   # tracks which GameState is active
+
+    METHOD change_state(new_state):
+        SET current_state = new_state
+        CALL current_state.on_enter()
+
+    METHOD update(events, dt):
+        CALL current_state.update(events, dt)
+
+    METHOD draw(screen):
+        CALL current_state.draw(screen)
+
+
+# =============================================================================
+# DESIGN PATTERN 2: STATE — GameState
+# =============================================================================
+# The State pattern gives each game state its own class with its own logic.
+# Instead of one giant loop full of if/else checks, each state handles
+# its own input, update, and draw. The GameManager switches between them.
+
+CLASS GameState (base class):
+    METHOD on_enter():   # called once when this state becomes active
+        PASS
+    METHOD update(events, dt):  # called every frame
+        PASS
+    METHOD draw(screen):        # called every frame
+        PASS
+
+CLASS MenuState EXTENDS GameState:
+    METHOD on_enter():
+        DISPLAY title and instructions
+    METHOD update(events, dt):
+        IF player presses ENTER:
+            CALL GameManager.get_instance().change_state(PlayingState)
+    METHOD draw(screen):
+        DRAW title text
+        DRAW "Press ENTER to start" text
+
+CLASS PlayingState EXTENDS GameState:
+    METHOD on_enter():
+        RESET player position
+        CLEAR enemies and bullets
+    METHOD update(events, dt):
+        HANDLE player movement input
+        UPDATE player position
+        SPAWN enemies on timer
+        UPDATE all enemy positions toward player
+        UPDATE all bullets
+        CHECK bullet/enemy collisions → add score, remove enemy
+        CHECK enemy/player collisions → remove life
+        IF lives == 0:
+            CALL GameManager.get_instance().change_state(GameOverState)
+        IF player presses ESCAPE:
+            CALL GameManager.get_instance().change_state(PausedState)
+    METHOD draw(screen):
+        DRAW background grid
+        DRAW all enemies
+        DRAW all bullets
+        DRAW player
+        DRAW HUD (score, lives, FPS)
+
+CLASS PausedState EXTENDS GameState:
+    METHOD on_enter():
+        DISPLAY pause overlay
+    METHOD update(events, dt):
+        IF player presses ESCAPE:
+            CALL GameManager.get_instance().change_state(PlayingState)
+    METHOD draw(screen):
+        DRAW previous frame dimmed
+        DRAW "PAUSED" text
+        DRAW "Press ESC to resume" text
+
+CLASS GameOverState EXTENDS GameState:
+    METHOD on_enter():
+        DISPLAY final score
+    METHOD update(events, dt):
+        IF player presses R:
+            RESET score and lives in GameManager
+            CALL GameManager.get_instance().change_state(PlayingState)
+        IF player presses ESCAPE:
+            QUIT game
+    METHOD draw(screen):
+        DRAW "GAME OVER" text
+        DRAW final score
+        DRAW "Press R to restart or ESC to quit"
+
+
+# =============================================================================
+# MAIN ENTRY POINT
+# =============================================================================
+FUNCTION main():
+    INITIALIZE pygame
+    CREATE screen
+    CREATE clock
+
+    manager = GameManager.get_instance()     # Singleton — one instance only
+    manager.change_state(MenuState())        # start in Menu state
+
+    WHILE game is running:
+        dt = clock.tick(60)
+        COLLECT events
+        CALL manager.update(events, dt)
+        CALL manager.draw(screen)
+        pygame.display.flip()
+
+    pygame.quit()

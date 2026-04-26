@@ -1,140 +1,83 @@
-# FPS Optimization Prototype
-**GDT-110 | Topic 2 Assignment**
+# Design Patterns Prototype
+**GDT-110 | Week 5 Assignment**
 **Student:** Levi
-**Engine/Language:** Python 3 + Pygame
+**Language:** Python 3.12 + Pygame
 
 ---
 
-## 📌 Project Overview
+## GitHub Repository
 
-This prototype demonstrates **frame rate optimization** as a core gameplay system mechanic, directly tied to the Topic 1 research report on *Frame Rate Optimization and Player Immersion in Fast-Paced Action Games*.
+https://github.com/JoeJeep/fps-prototype
 
-The prototype lets you **feel** the difference between 30 FPS, 60 FPS, and uncapped frame rates in real time while playing a simple action game. It also visually demonstrates **object pooling** — one of the key architectural techniques covered in the research report — by showing how bullets are reused from a pre-allocated pool instead of being created and destroyed every frame.
+## Video Demo
 
----
-
-## 🎮 Gameplay Features
-
-| Feature | Description |
-|---|---|
-| **Live FPS Counter** | Real-time FPS display with color coding (green/orange/red) |
-| **FPS Mode Toggle** | Switch between 30, 60, and uncapped FPS mid-game with TAB |
-| **FPS History Graph** | Mini line graph in the top-right showing frame rate over time |
-| **Object Pooling** | Bullets drawn from a pre-allocated pool of 60 — HUD shows active vs. waiting |
-| **Enemy Spawning** | Enemies spawn from screen edges and chase the player |
-| **Shooting** | Aim with mouse, shoot with SPACE |
-| **Score System** | Earn 10 points per enemy eliminated |
+[Insert Loom link here after recording]
 
 ---
 
-## 🖥️ How to Run
+## Project Overview
 
-### Step 1 — Install Python
-If you don't have Python installed:
-1. Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
-2. Download **Python 3.10 or newer**
-3. During install, **check the box that says "Add Python to PATH"**
+This prototype is a top-down shooter that demonstrates two software design patterns — Singleton and State — applied to a working game. The game features a menu screen, full gameplay with enemies and shooting, a pause screen, and a game over screen, all managed cleanly through the two patterns.
 
-### Step 2 — Install Pygame
-Open a terminal (Command Prompt or PowerShell on Windows, Terminal on Mac):
+---
+
+## Design Patterns Used
+
+**Singleton (game_manager.py)**
+GameManager.get_instance() always returns the same shared object. Score, lives, and high score are tracked in one place and accessible from anywhere without passing references around.
+
+**State (game_states.py)**
+The game has four states: Menu, Playing, Paused, Game Over. Each is its own class with its own logic. GameManager.change_state() switches between them cleanly with no if/else chains in the main loop.
+
+---
+
+## How to Run
+
+### Requirements
+- Python 3.10, 3.11, or 3.12
+- Pygame
+
+### Install Pygame
 ```
-pip install pygame
+py -3.12 -m pip install pygame
 ```
 
-### Step 3 — Download / Clone the Project
-**Option A — Download ZIP:**
-1. Click the green **Code** button on GitHub
-2. Click **Download ZIP**
-3. Extract the folder anywhere on your computer
-
-**Option B — Clone with Git:**
+### Run the Game
 ```
-git clone https://github.com/YOUR_USERNAME/fps-prototype.git
-```
-
-### Step 4 — Open in VS Code
-1. Open **VS Code**
-2. Click **File → Open Folder**
-3. Select the `fps_prototype` folder you just extracted or cloned
-4. You should see `main.py` and `object_pool.py` in the Explorer panel on the left
-
-### Step 5 — Run the Game
-**Option A — From VS Code terminal:**
-1. Press **Ctrl + `** (backtick) to open the terminal inside VS Code
-2. Type:
-```
-python main.py
-```
-3. Press Enter — the game window will open
-
-**Option B — From your system terminal:**
-1. Navigate to the folder:
-```
-cd path/to/fps_prototype
-```
-2. Run:
-```
-python main.py
+py -3.12 main.py
 ```
 
 ---
 
-## 🕹️ Controls
+## Controls
 
 | Key | Action |
 |---|---|
-| **W A S D** or **Arrow Keys** | Move player |
-| **SPACE** | Shoot toward nearest enemy |
-| **TAB** | Cycle FPS mode (30 → 60 → Uncapped → 30) |
-| **Close Window** | Quit |
+| ENTER | Start game from menu |
+| WASD | Move player |
+| SPACE | Shoot toward nearest enemy |
+| ESC | Pause during gameplay |
+| ESC | Resume from pause |
+| R | Restart from game over |
+| ESC | Quit from menu or game over |
 
 ---
 
-## 📊 What to Observe
-
-1. **Start at 60 FPS** (default) — movement feels smooth, enemies are manageable
-2. **Press TAB to switch to 30 FPS** — notice the choppier movement and slower bullet response
-3. **Press TAB again for Uncapped** — watch the FPS graph spike; on fast machines this can exceed 500+ FPS
-4. **Watch the pool HUD** — as you shoot, "Active" bullets increase and "Pooled" bullets decrease. When bullets go off-screen, they return to the pool — no new objects are ever created mid-game
-
----
-
-## 🗂️ File Structure
+## File Structure
 
 ```
-fps_prototype/
-├── main.py          ← Main game loop, player, enemies, HUD, rendering
-├── object_pool.py   ← Bullet and BulletPool classes (object pooling demo)
-└── README.md        ← This file
+design_patterns/
+├── main.py           Entry point, game loop, Singleton and State setup
+├── game_manager.py   Singleton pattern — GameManager class
+├── game_states.py    State pattern — MenuState, PlayingState, PausedState, GameOverState
+├── pseudocode.txt    High-level pseudocode outlining both patterns
+└── README.md         This file
 ```
 
 ---
 
-## 🔗 GitHub Repository
+## References
 
-[https://github.com/JoeJeep/fps-prototype](https://github.com/JoeJeep/fps-prototype)
+Gamma, E., Helm, R., Johnson, R., & Vlissides, J. (1994). Design patterns: Elements of reusable object-oriented software. Addison-Wesley.
 
----
-
-## 📹 Video Demo
-
-[https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c](https://www.loom.com/share/a27ed17b3ae14f2f99067ce01043202c)
-
----
-
-## 📚 Concepts Demonstrated
-
-- **Frame Rate Capping** — `clock.tick(fps)` enforces a frame budget, matching how Unreal, Unity, and Godot manage their render loops
-- **Object Pooling** — Pre-allocated `BulletPool` avoids runtime memory allocation and garbage collection spikes (directly references the GC stutter issue discussed in the research report)
-- **FPS Monitoring** — Live sampling mirrors the profiling tools in Unity's Frame Debugger and Unreal's Stat commands
-- **Game/System Separation** — `object_pool.py` is a separate module from `main.py`, mirroring the architectural separation discussed across all five engines in the report
-
----
-
-## 📖 References
-
-Epic Games. (2024). *Rendering and graphics in Unreal Engine.* https://dev.epicgames.com/documentation/en-us/unreal-engine/rendering-and-graphics-in-unreal-engine
-
-Unity Technologies. (2024). *Scriptable Render Pipeline.* https://docs.unity3d.com/Manual/ScriptableRenderPipeline.html
-
-Pygame Community. (2024). *Pygame documentation.* https://www.pygame.org/docs/
+Pygame Community. (2024). Pygame documentation. https://www.pygame.org/docs/
